@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>VOID ENGINE — RAJA</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:#000;color:#fff;font-family:Helvetica,Arial,sans-serif;min-height:100%;overflow-x:hidden}
+body{display:flex;flex-direction:column;align-items:center}
+.top{width:100%;height:42px;border-bottom:1px solid #fff;display:flex;align-items:center;padding:0 12px;position:sticky;top:0;background:#000;z-index:30}
+.brand{font-weight:900;letter-spacing:.12em;font-size:11px}.brand b{color:#ff0033}
+.hero{text-align:center;padding:14px 10px 6px;max-width:900px}
+.hero h1{font-size:clamp(20px,5.5vw,36px);font-weight:900;line-height:1.05}
+.hero h1 span{color:#ff0033}
+.sub{font-size:10px;color:#666;margin-top:4px}
+#banner{display:none;margin-top:8px;padding:5px 8px;border:1px solid #ff0033;color:#ff0033;font-size:9px;font-weight:700}
+.main{display:flex;flex-wrap:wrap;width:100%;max-width:960px;border:1px solid #333;margin:8px 4px}
+.cw{flex:1 1 240px;position:relative;background:#000;min-height:160px}
+#gl{display:block;width:100%;height:100%;min-height:160px;touch-action:none;background:#000}
+.tel{flex:0 0 180px;background:#0a0a0a;border-left:1px solid #333;padding:8px 10px;font-size:9px}
+.th{display:flex;justify-content:space-between;margin-bottom:6px;padding-bottom:3px;border-bottom:1px solid #222;font-weight:900;letter-spacing:.08em}
+.live{color:#ff0033}
+.tg{margin-bottom:8px}
+.tl{font-size:7px;letter-spacing:.12em;color:#555;margin-bottom:3px;font-weight:700}
+.sr{display:flex;justify-content:space-between;padding:1px 0;border-bottom:1px solid #151515}
+.sl{color:#555}.sv{font-weight:700}
+.fps{color:#0f0;font-size:13px}.low{color:#ff0}.score{color:#ff0033;font-size:16px;font-weight:900}
+.gpu{max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ctrl{width:100%;max-width:960px;padding:10px 6px 24px}
+.ml{font-size:8px;letter-spacing:.14em;color:#555;text-align:center;margin-bottom:6px;font-weight:700}
+.bg{display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:4px;margin-bottom:8px}
+.bm{background:#111;border:1px solid #333;color:#fff;padding:7px 3px;cursor:pointer;font-family:inherit;text-align:center;-webkit-tap-highlight-color:transparent}
+.bm.active{border-color:#ff0033;background:#1a0005}
+.bl{display:block;font-size:7px;color:#555;letter-spacing:.08em}.bn{display:block;font-size:8px;font-weight:900}
+.row{display:flex;justify-content:center;gap:5px;flex-wrap:wrap;margin-bottom:6px}
+.ba{background:#000;border:1px solid #fff;color:#fff;padding:7px 10px;font-size:8px;font-weight:700;letter-spacing:.06em;cursor:pointer;font-family:inherit}
+#warn{display:none;text-align:center;padding:5px;border:1px solid #ff0033;color:#ff0033;font-size:9px;font-weight:700;margin-top:4px}
+#st{text-align:center;font-size:9px;color:#555;margin-top:4px}
+footer{width:100%;border-top:1px solid #222;padding:8px;text-align:center;font-size:8px;color:#444}
+@media(max-width:640px){.tel{flex:1 1 100%;border-left:none;border-top:1px solid #333}}
+</style>
+</head>
+<body>
+<nav class="top"><div class="brand"><b>VOID</b> ENGINE NUCLEAR</div></nav>
+<header class="hero">
+  <h1>GPU<br><span>TOTAL DESTRUCTION</span></h1>
+  <p class="sub">Designed to freeze weak GPUs. Use at own risk.</p>
+  <div id="banner"></div>
+</header>
+<main class="main">
+  <div class="cw"><canvas id="gl"></canvas></div>
+  <aside class="tel">
+    <div class="th"><span>TELEMETRY</span><span class="live">■ LIVE</span></div>
+    <div class="tg"><div class="tl">HW</div>
+      <div class="sr"><span class="sl">GPU</span><span class="sv gpu" id="sg">—</span></div>
+      <div class="sr"><span class="sl">RES</span><span class="sv" id="sr">—</span></div>
+    </div>
+    <div class="tg"><div class="tl">PERF</div>
+      <div class="sr"><span class="sl">FPS</span><span class="sv fps" id="sf">0</span></div>
+      <div class="sr"><span class="sl">1%L</span><span class="sv low" id="s1">0</span></div>
+      <div class="sr"><span class="sl">MS</span><span class="sv" id="sft">—</span></div>
+    </div>
+    <div class="tg"><div class="tl">LOAD</div>
+      <div class="sr"><span class="sl">RAYS</span><span class="sv" id="sry">—</span></div>
+      <div class="sr"><span class="sl">OPS</span><span class="sv" id="sop">—</span></div>
+    </div>
+    <div class="tg"><div class="tl">SCORE</div>
+      <div class="sr"><span class="sv score" id="ss">0</span></div>
+    </div>
+  </aside>
+</main>
+<section class="ctrl">
+  <div class="ml">LEVEL</div>
+  <div class="bg" id="btns">
+    <button class="bm" data-l="1"><span class="bl">01</span><span class="bn">MELT</span></button>
+    <button class="bm" data-l="2"><span class="bl">02</span><span class="bn">NUKE</span></button>
+    <button class="bm" data-l="3"><span class="bl">03</span><span class="bn">INFERNO</span></button>
+    <button class="bm" data-l="4"><span class="bl">04</span><span class="bn">SING</span></button>
+    <button class="bm" data-l="5"><span class="bl">05</span><span class="bn">ARMA</span></button>
+    <button class="bm" data-l="6"><span class="bl">06</span><span class="bn">BIGRIP</span></button>
+    <button class="bm" data-l="7"><span class="bl">07</span><span class="bn">HEAT</span></button>
+    <button class="bm active" data-l="8"><span class="bl">08</span><span class="bn">VOID</span></button>
+  </div>
+  <div class="row">
+    <button class="ba" id="bshare">SHARE</button>
+    <button class="ba" id="bfs">FULL</button>
+  </div>
+  <div id="warn"></div>
+  <div id="st">boot…</div>
+</section>
+<footer>VOID NUCLEAR — may freeze device. host on Vercel at own risk.</footer>
+
+<script>
+(function(){
+'use strict';
+
+/* steps = raymarch budget, fold = fractal depth, scale = pixel multiplier, passes = full-screen redraws */
+var LVL={
+  1:{n:'MELT',    steps:120,  fold:8,  scale:1.2, passes:1, msg:''},
+  2:{n:'NUKE',    steps:220,  fold:10, scale:1.4, passes:1, msg:''},
+  3:{n:'INFERNO', steps:350,  fold:12, scale:1.6, passes:1, msg:''},
+  4:{n:'SING',    steps:500,  fold:14, scale:1.9, passes:1, msg:'SINGULARITY'},
+  5:{n:'ARMA',    steps:700,  fold:16, scale:2.2, passes:2, msg:'ARMAGEDDON — dual pass'},
+  6:{n:'BIGRIP',  steps:950,  fold:18, scale:2.6, passes:2, msg:'BIG RIP — dual pass + high res'},
+  7:{n:'HEAT',    steps:1300, fold:20, scale:3.0, passes:3, msg:'HEAT DEATH — triple pass'},
+  8:{n:'VOID',    steps:1800, fold:24, scale:3.5, passes:4, msg:'VOID NUCLEAR — 4 passes. expect crash'}
+};
+
+var cur=8,gl=null,prog=null,canvas=null;
+var ax=.4,ay=.7,drag=false,lx=0,ly=0;
+var fts=[],last=0,t0=0;
+var uT,uR,uA,uS,uF,uP;
+var st=null;
+
+var VS='attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}';
+
+/* Maximum cost fragment: 4 distance fields + shadows + AO + multi-pass driven by uniform */
+var FS=[
+'precision highp float;',
+'uniform vec2 uR;',
+'uniform float uT;',
+'uniform vec2 uA;',
+'uniform float uS;',
+'uniform float uF;',
+'uniform float uP;',
+'',
+'mat2 rot(float a){float c=cos(a),s=sin(a);return mat2(c,-s,s,c);}',
+'',
+'float mb(vec3 p){',
+'  vec3 z=p;float dr=1.;float sc=2.35;',
+'  for(int i=0;i<40;i++){',
+'    if(float(i)>=uF)break;',
+'    z=clamp(z,-1.,1.)*2.-z;',
+'    float r2=dot(z,z);',
+'    if(r2<.5){z*=4.;dr*=4.;}',
+'    else if(r2<1.){float t=1./r2;z*=t;dr*=t;}',
+'    z=z*sc+p;dr=dr*abs(sc)+1.;',
+'    z.xy*=rot(.35+uT*.015);',
+'    z.xz*=rot(.2);',
+'  }',
+'  return .18*log(dot(z,z)+1e-8)*length(z)/dr;',
+'}',
+'',
+'float jl(vec3 p){',
+'  vec3 z=p;float m=dot(z,z);',
+'  vec3 c=vec3(sin(uT*.1)*.45,cos(uT*.13)*.34,.17);',
+'  for(int i=0;i<48;i++){',
+'    if(float(i)>=uF*1.7)break;',
+'    z=abs(z)/(m+1e-7)+c;',
+'    z.xy*=rot(.75);z.xz*=rot(.5);z.yz*=rot(.3);',
+'    z+=.02*sin(z.yzx*3.5+uT);',
+'    m=dot(z,z);',
+'    if(m>32.)break;',
+'  }',
+'  return .16*sqrt(m);',
+'}',
+'',
+'float ns(vec3 p){',
+'  float a=0.;float w=1.;',
+'  for(int i=0;i<12;i++){',
+'    if(float(i)>=uF*.5)break;',
+'    a+=w*sin(p.x)*sin(p.y)*sin(p.z);',
+'    p=p*2.15+vec3(1.7,2.3,1.1);',
+'    p.xy*=rot(.55);p.xz*=rot(.3);',
+'    w*=.52;',
+'  }',
+'  return abs(a)*.12;',
+'}',
+'',
+'float gy(vec3 p){',
+'  float d=0.;',
+'  for(int i=0;i<6;i++){',
+'    if(float(i)>=uF*.3)break;',
+'    d+=abs(dot(sin(p),cos(p.zxy)))*.15;',
+'    p=p*1.9+vec3(.5);',
+'    p.xy*=rot(.4);',
+'  }',
+'  return d;',
+'}',
+'',
+'float map(vec3 p){',
+'  float d=mb(p);',
+'  d=min(d,jl(p)*.68);',
+'  d=min(d,ns(p*1.3)+.015);',
+'  d=min(d,gy(p*1.1)*.5+.02);',
+'  return d;',
+'}',
+'',
+'vec3 nor(vec3 p){',
+'  float e=.0012;',
+'  return normalize(vec3(',
+'    map(p+vec3(e,0,0))-map(p-vec3(e,0,0)),',
+'    map(p+vec3(0,e,0))-map(p-vec3(0,e,0)),',
+'    map(p+vec3(0,0,e))-map(p-vec3(0,0,e))',
+'  ));',
+'}',
+'',
+'void main(){',
+'  vec2 uv=(gl_FragCoord.xy-.5*uR)/min(uR.x,uR.y);',
+'  float ca=cos(uA.y),sa=sin(uA.y);',
+'  float cb=cos(uA.x),sb=sin(uA.x);',
+'  vec3 ro=vec3(sa*cb,sb,ca*cb)*2.85;',
+'  vec3 ww=normalize(-ro);',
+'  vec3 uu=normalize(cross(ww,vec3(0,1,0)));',
+'  vec3 vv=cross(uu,ww);',
+'  vec3 rd=normalize(uv.x*uu+uv.y*vv+1.45*ww);',
+'',
+'  float t=0.;float d;',
+'  for(int i=0;i<2000;i++){',
+'    if(float(i)>=uS)break;',
+'    vec3 p=ro+rd*t;',
+'    d=map(p);',
+'    if(d<.0012||t>15.)break;',
+'    t+=d*.6;',
+'  }',
+'',
+'  vec3 col=vec3(0);',
+'  if(t<15.){',
+'    vec3 p=ro+rd*t;',
+'    vec3 n=nor(p);',
+'    vec3 L=normalize(vec3(.5,.9,-.3));',
+'    float dif=max(dot(n,L),0.);',
+'    float fre=pow(1.-max(dot(n,-rd),0.),3.);',
+'    float trap=length(p)*.38;',
+'    vec3 base=.5+.5*cos(vec3(0,2,4)+trap*3.+uT*.45);',
+'    col=base*(.1+.9*dif)+fre*vec3(.9,.15,.28);',
+'    col*=exp(-.075*t);',
+'',
+'    float sh=1.;float ts=.015;',
+'    for(int i=0;i<32;i++){',
+'      if(float(i)>=uF)break;',
+'      float sd=map(p+L*ts);',
+'      sh=min(sh,10.*sd/ts);',
+'      ts+=clamp(sd,.015,.1);',
+'      if(ts>2.5)break;',
+'    }',
+'    col*=.3+.7*clamp(sh,0.,1.);',
+'',
+'    float ao=0.;float sc=.008;',
+'    for(int i=0;i<10;i++){',
+'      ao+=(sc-map(p+n*sc))*pow(.65,float(i));',
+'      sc+=.025;',
+'    }',
+'    col*=clamp(1.-ao*1.5,0.,1.);',
+'  }else{',
+'    float g=exp(-length(uv)*1.15);',
+'    col=vec3(.008,0,.02)+g*vec3(.08,0,.035);',
+'  }',
+'',
+'  /* extra ray cost when passes > 1 */',
+'  if(uP>1.5){',
+'    for(int k=0;k<6;k++){',
+'      vec2 off=vec2(sin(float(k)*2.1),cos(float(k)*1.7))*.003;',
+'      vec3 rd2=normalize((uv+off).x*uu+(uv+off).y*vv+1.45*ww);',
+'      float t2=0.;',
+'      for(int i=0;i<300;i++){',
+'        if(float(i)>=uS*.12)break;',
+'        float d2=map(ro+rd2*t2);',
+'        if(d2<.002||t2>15.)break;',
+'        t2+=d2*.65;',
+'      }',
+'      if(t2<15.)col+=vec3(.03);',
+'    }',
+'    col/=1.5;',
+'  }',
+'',
+'  col*=1.-.25*dot(uv,uv);',
+'  col+=.008*sin(gl_FragCoord.y*2.2+uT*10.);',
+'  gl_FragColor=vec4(col,1);',
+'}'
+].join('\n');
+
+function msg(m){if(st)st.textContent=m;}
+
+function compile(type,src){
+  var s=gl.createShader(type);
+  gl.shaderSource(s,src);gl.compileShader(s);
+  if(!gl.getShaderParameter(s,gl.COMPILE_STATUS)){
+    var e=gl.getShaderInfoLog(s)||'?';
+    msg('SHADER: '+e.substring(0,100));
+    console.error(e);return null;
+  }
+  return s;
+}
+
+function init(){
+  canvas=document.getElementById('gl');
+  gl=canvas.getContext('webgl',{antialias:false,alpha:false,depth:false,powerPreference:'high-performance',failIfMajorPerformanceCaveat:false});
+  if(!gl)gl=canvas.getContext('experimental-webgl');
+  if(!gl){msg('No WebGL');return false;}
+
+  var vs=compile(gl.VERTEX_SHADER,VS);
+  var fs=compile(gl.FRAGMENT_SHADER,FS);
+  if(!vs||!fs)return false;
+  prog=gl.createProgram();
+  gl.attachShader(prog,vs);gl.attachShader(prog,fs);
+  gl.linkProgram(prog);
+  if(!gl.getProgramParameter(prog,gl.LINK_STATUS)){msg('LINK FAIL');return false;}
+  gl.useProgram(prog);
+
+  var b=gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER,b);
+  gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,1,1]),gl.STATIC_DRAW);
+  var loc=gl.getAttribLocation(prog,'a');
+  gl.enableVertexAttribArray(loc);
+  gl.vertexAttribPointer(loc,2,gl.FLOAT,false,0,0);
+
+  uT=gl.getUniformLocation(prog,'uT');
+  uR=gl.getUniformLocation(prog,'uR');
+  uA=gl.getUniformLocation(prog,'uA');
+  uS=gl.getUniformLocation(prog,'uS');
+  uF=gl.getUniformLocation(prog,'uF');
+  uP=gl.getUniformLocation(prog,'uP');
+
+  var dbg=gl.getExtension('WEBGL_debug_renderer_info');
+  var gn='GPU';
+  try{if(dbg)gn=gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL)||gn;}catch(e){}
+  var ge=document.getElementById('sg');
+  if(ge){ge.textContent=gn;ge.title=gn;}
+
+  resize();
+  msg('NUCLEAR ready');
+  return true;
+}
+
+function resize(){
+  if(!canvas||!gl)return;
+  var w=Math.max(140,canvas.parentElement.clientWidth||280);
+  var h=Math.max(140,Math.floor(w*.52));
+  var L=LVL[cur]||LVL[8];
+  var dpr=(window.devicePixelRatio||1)*L.scale;
+  dpr=Math.min(dpr,4.0);
+  canvas.width=Math.floor(w*dpr);
+  canvas.height=Math.floor(h*dpr);
+  canvas.style.width=w+'px';
+  canvas.style.height=h+'px';
+  gl.viewport(0,0,canvas.width,canvas.height);
+  var re=document.getElementById('sr');
+  if(re)re.textContent=canvas.width+'x'+canvas.height;
+}
+
+function setL(n){
+  cur=n;
+  var bs=document.querySelectorAll('.bm');
+  for(var i=0;i<bs.length;i++)bs[i].classList.toggle('active',Number(bs[i].getAttribute('data-l'))===n);
+  var L=LVL[n];
+  var w=document.getElementById('warn');
+  if(L.msg){w.style.display='block';w.textContent=L.msg;}
+  else w.style.display='none';
+  resize();
+  try{var u=new URL(location.href);u.searchParams.set('s',String(n));history.replaceState(null,'',u);}catch(e){}
+}
+
+function frame(now){
+  if(!gl||!prog)return;
+  if(!last)last=now;
+  var dt=now-last;last=now;
+  fts.push(dt);if(fts.length>40)fts.shift();
+
+  var L=LVL[cur]||LVL[8];
+  var t=(now-t0)*.001;
+
+  gl.uniform1f(uT,t);
+  gl.uniform2f(uR,canvas.width,canvas.height);
+  gl.uniform2f(uA,ax,ay);
+  gl.uniform1f(uS,L.steps);
+  gl.uniform1f(uF,L.fold);
+  gl.uniform1f(uP,L.passes);
+
+  /* multi-pass: draw full screen multiple times per frame */
+  var p=L.passes|0;
+  if(p<1)p=1;
+  for(var i=0;i<p;i++){
+    gl.drawArrays(gl.TRIANGLE_STRIP,0,4);
+  }
+
+  if(fts.length>2){
+    var sum=0;for(var i=0;i<fts.length;i++)sum+=fts[i];
+    var avg=sum/fts.length;
+    var fps=1000/(avg||1);
+    var srt=fts.slice().sort(function(a,b){return b-a;});
+    var low=1000/(srt[Math.floor(srt.length*.01)]||avg||1);
+    document.getElementById('sf').textContent=String(Math.round(fps));
+    document.getElementById('s1').textContent=String(Math.round(low));
+    document.getElementById('sft').textContent=avg.toFixed(0);
+    var px=canvas.width*canvas.height;
+    var rays=(px*L.steps*fps*L.passes)/1e6;
+    document.getElementById('sry').textContent=rays.toFixed(1)+'M';
+    document.getElementById('sop').textContent=(rays*L.fold*.04).toFixed(1)+'G';
+    document.getElementById('ss').textContent=Math.round(fps*Math.sqrt(L.steps*L.fold)*L.passes*5).toLocaleString();
+  }
+  requestAnimationFrame(frame);
+}
+
+function input(){
+  function s(x,y){drag=true;lx=x;ly=y;}
+  function m(x,y){
+    if(!drag)return;
+    ay+=(x-lx)*.007;ax+=(y-ly)*.007;
+    if(ax<-1.3)ax=-1.3;if(ax>1.3)ax=1.3;
+    lx=x;ly=y;
+  }
+  function e(){drag=false;}
+  canvas.addEventListener('mousedown',function(ev){s(ev.clientX,ev.clientY);});
+  window.addEventListener('mousemove',function(ev){m(ev.clientX,ev.clientY);});
+  window.addEventListener('mouseup',e);
+  canvas.addEventListener('touchstart',function(ev){ev.preventDefault();var t=ev.touches[0];s(t.clientX,t.clientY);},{passive:false});
+  canvas.addEventListener('touchmove',function(ev){ev.preventDefault();var t=ev.touches[0];m(t.clientX,t.clientY);},{passive:false});
+  canvas.addEventListener('touchend',e);
+  window.addEventListener('resize',resize);
+}
+
+function boot(){
+  st=document.getElementById('st');
+  if(!init())return;
+  input();
+  t0=performance.now();last=t0;
+
+  var level=8;
+  try{
+    var p=new URLSearchParams(location.search);
+    var s=parseInt(p.get('s')||'8',10);
+    if(s>=1&&s<=8)level=s;
+    if(p.has('s')){
+      var b=document.getElementById('banner');
+      b.style.display='block';
+      b.innerHTML='PRELOAD <b>'+LVL[level].n+'</b> s='+level;
+    }
+  }catch(e){}
+  setL(level);
+
+  document.getElementById('btns').addEventListener('click',function(ev){
+    var t=ev.target;
+    while(t&&t!==this){
+      if(t.classList&&t.classList.contains('bm')){setL(Number(t.getAttribute('data-l')));break;}
+      t=t.parentNode;
+    }
+  });
+
+  document.getElementById('bshare').onclick=function(){
+    var url=location.href.split('?')[0]+'?s='+cur;
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(url).then(function(){
+        var b=document.getElementById('bshare');b.textContent='OK';
+        setTimeout(function(){b.textContent='SHARE';},1000);
+      }).catch(function(){prompt('Copy',url);});
+    }else prompt('Copy',url);
+  };
+  document.getElementById('bfs').onclick=function(){
+    if(!document.fullscreenElement)(canvas.requestFullscreen||canvas.webkitRequestFullscreen||function(){}).call(canvas);
+    else (document.exitFullscreen||document.webkitExitFullscreen||function(){}).call(document);
+  };
+
+  requestAnimationFrame(frame);
+}
+
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);
+else boot();
+})();
+</script>
+</body>
+</html>
